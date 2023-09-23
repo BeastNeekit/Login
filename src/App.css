@@ -1,0 +1,36 @@
+/* App.css */
+.announcement-item {
+    background-color: #f7f7f7; /* Light gray background color */
+    border: 1px solid #ddd;   /* Gray border */
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.announcement-item strong {
+    color: #007bff;
+}
+
+.welcome-message {
+    font-size: 24px;
+    color: #07192a; /* Green color for the welcome message */
+    margin-bottom: 20px;
+}
+
+/* Style for the announcements section */
+.announcement-container {
+    border: 1px solid #ccc; /* Light gray border for the announcements section */
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.announcement-item {
+    background-color: #f7f7f7; /* Light gray background color for announcements */
+    border: 1px solid #ddd;   /* Gray border for announcements */
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.announcement-item strong {
+    color: #007bff; /* Blue color for announcement titles */
+}
