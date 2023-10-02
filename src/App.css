@@ -1,36 +1,112 @@
-/* App.css */
-.announcement-item {
-    background-color: #f7f7f7; /* Light gray background color */
-    border: 1px solid #ddd;   /* Gray border */
-    padding: 10px;
-    margin-bottom: 10px;
-}
+body {
+  font-family: Arial, sans-serif;
+    background-image: url('static/neekit.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
 
+}
 .announcement-item strong {
-    color: #007bff;
+  color: #007bff;
 }
 
 .welcome-message {
-    font-size: 24px;
-    color: #07192a; /* Green color for the welcome message */
-    margin-bottom: 20px;
+  font-size: 24px;
+  color: #31dc0b;
+  margin-bottom: 20px;
 }
 
-/* Style for the announcements section */
+
 .announcement-container {
-    border: 1px solid #ccc; /* Light gray border for the announcements section */
-    border-radius: 5px;
-    padding: 15px;
-    margin-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  margin-top: 20px;
 }
 
 .announcement-item {
-    background-color: #f7f7f7; /* Light gray background color for announcements */
-    border: 1px solid #ddd;   /* Gray border for announcements */
-    padding: 10px;
-    margin-bottom: 10px;
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 .announcement-item strong {
-    color: #007bff; /* Blue color for announcement titles */
+  color: #007bff; /* Blue color for announcement titles */
 }
+table {
+  width: 100%;
+}
+
+table th,
+table td {
+  text-align: center;
+}
+
+.mt-2 {
+  margin-top: 10px;
+}
+
+
+
+.registration-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #eee9e9;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 16px;
+}
+
+/* Register Button */
+.register-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.register-button:hover {
+  background-color: #0056b3;
+}
+
+/* Error Message */
+.error-message {
+  color: #ff0000;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Success Message */
+.success-message {
+  color: #00aa00;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+
+

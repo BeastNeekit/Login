@@ -1,0 +1,6 @@
+/* Example of changing font size for smaller screens */
+@media (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+}
