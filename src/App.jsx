@@ -6,7 +6,10 @@ import LogIn from './LogIn';
 import Registration from './Registration';
 import Payment from './Payment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingCart ,faTrash , faTrashCan , faSignOut , faCreditCard, faCashRegister} from '@fortawesome/free-solid-svg-icons';
+import RatingSection from './RatingSection.jsx';
+import WebsiteAd from './WebsiteAd.jsx';
+
+import { faShoppingCart ,faTrash , faTrashCan , faSignOut , faCreditCard, faCashRegister , faBell} from '@fortawesome/free-solid-svg-icons';
 
 
 function App() {
@@ -18,8 +21,8 @@ function App() {
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState('');
     const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
-
-
+    const [showAnnouncements, setShowAnnouncements] = useState(false);
+    const [notificationCount, setNotificationCount] = useState(0);
     const handleSuccessfulLogin = (userName) => {
         setName(userName); // Set the user's name
         setLoggedIn(true); // Set loggedIn to true
@@ -55,9 +58,30 @@ function App() {
             id: 3,
             title: 'Quick View',
             content: 'Better Place for better person.',
-        },
+        }
     ];
+    const markAnnouncementAsRead = (id) => {
+        const updatedAnnouncements = announcements.map((announcement) => {
+            if (announcement.id === id) {
+                return { ...announcement, read: true };
+            }
+            return announcement;
+        });
+        setNotificationCount((prevCount) => prevCount - 1);
+        setAnnouncements(updatedAnnouncements);
+    };
 
+    useEffect(() => {
+        // Calculate the initial notification count on component mount
+        const unreadCount = announcements.filter((announcement) => !announcement.read).length;
+        setNotificationCount(unreadCount);
+    }, []);
+
+    useEffect(() => {
+        // Recalculate the notification count whenever announcements change
+        const unreadCount = announcements.filter((announcement) => !announcement.read).length;
+        setNotificationCount(unreadCount);
+    }, [announcements]);
 
     const marketItems = [
         {
@@ -65,36 +89,42 @@ function App() {
             name: 'IPhone 15',
             price: 999.99,
             image: './static/i-phone.jpeg',
+            loading:'lazy',
         },
         {
             id: 2,
             name: 'Mac-Book',
             price: 3808.55,
             image: './static/mac-book.jpeg',
+            loading:'lazy',
         },
         {
             id: 3,
             name: 'Louis Vuitton',
             price: 990,
             image: './static/L-v.jpeg',
+            loading:'lazy',
         },
         {
             id: 4,
             name: 'Gucci-Cap',
             price: 308,
             image: './static/Gucci-Cap.jpeg',
+            loading:'lazy',
         },
         {
             id: 5,
             name: 'Hoddie',
             price: 110,
             image: './static/Hoddie.jpeg',
+            loading:'lazy',
         },
         {
             id: 6,
             name: 'GRK10K',
             price: 79,
             image: './static/GRK10K.jpeg',
+            loading:'lazy',
         }
     ];
 
@@ -163,18 +193,36 @@ function App() {
                             {loggedIn ? (
                                 <div>
                                     <h3 className="welcome-message">Hey, {name}!</h3>
-                                    {/* Announcements section */}
-                                    <div className="mt-3 announcement-container">
-                                        <h4>Announcements</h4>
-                                        <ul className="list-group">
-                                            {announcements.map((announcement) => (
-                                                <li key={announcement.id} className="list-group-item announcement-item">
-                                                    <strong>{announcement.title}</strong>
-                                                    <p>{announcement.content}</p>
-                                                </li>
-                                            ))}
-                                        </ul>
+                                    <div className="notification-icon-container">
+                                        <FontAwesomeIcon
+                                            icon={faBell}
+                                            className={`notification-icon ${showAnnouncements ? 'active' : ''}`}
+                                            onClick={() => setShowAnnouncements(!showAnnouncements)}
+                                        />
+                                        {notificationCount > 0 && (
+                                            <span className="notification-count">{notificationCount}</span>
+                                        )}
                                     </div>
+                                    {showAnnouncements && (
+                                        <div className="announcement-container mt-3">
+                                            <h4>Announcements</h4>
+                                            <ul className="list-group">
+                                                {announcements.map((announcement) => (
+                                                    <li
+                                                        key={announcement.id}
+                                                        className={`list-group-item announcement-item ${
+                                                            announcement.read ? 'read' : 'unread'
+                                                        }`}
+                                                        onClick={() => markAnnouncementAsRead(announcement.id)}
+                                                    >
+                                                        <strong>{announcement.title}</strong>
+                                                        <p>{announcement.content}</p>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
                                     <div className="d-grid gap-2 d-md-flex justify-content-md-end">
                                         <button className="btn btn-danger " onClick={handleLogout}>
                                             <FontAwesomeIcon icon={faSignOut}  />
@@ -278,6 +326,11 @@ function App() {
                                             </Modal>
                                         </div>
                                     </div>
+                                    {/* Add the RatingSection component */}
+                                    <div className="mt-3">
+                                        <h4>Give a Rating</h4>
+                                        <RatingSection />
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="LogIn-container">
@@ -288,7 +341,9 @@ function App() {
                                         <FontAwesomeIcon icon={faCashRegister} className="mr-1" />
                                         Register
                                     </button>
+                                    <WebsiteAd />
                                 </div>
+
                             )}
                         </div>
                     </div>

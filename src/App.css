@@ -78,7 +78,7 @@ table td {
   font-size: 16px;
 }
 
-/* Register Button */
+
 .register-button {
   background-color: #007bff;
   color: #fff;
@@ -94,19 +94,39 @@ table td {
   background-color: #0056b3;
 }
 
-/* Error Message */
-.error-message {
-  color: #ff0000;
-  font-size: 14px;
-  margin-top: 5px;
+
+
+
+
+.notification-icon-container {
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+  font-size:20px;
+}
+.notification-icon.active {
+   color: #ff0000;
+   font-size: 24px;
+ }
+
+
+
+.notification-icon.active + .announcement-container {
+  display: block;
 }
 
-/* Success Message */
-.success-message {
-  color: #00aa00;
-  font-size: 14px;
-  margin-top: 5px;
-}
 
+.notification-count {
+  position: absolute;
+  top: -8px;
+  right: -19px;
+  background-color: #f30505;
+  color: white;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 50%;
+}
 
 
