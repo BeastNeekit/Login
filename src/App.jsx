@@ -6,10 +6,12 @@ import LogIn from './LogIn';
 import Registration from './Registration';
 import Payment from './Payment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import RatingSection from './RatingSection.jsx';
-import WebsiteAd from './WebsiteAd.jsx';
 
-import { faShoppingCart ,faTrash , faTrashCan , faSignOut , faCreditCard, faCashRegister , faBell} from '@fortawesome/free-solid-svg-icons';
+import WebsiteAd from './WebsiteAd.jsx';
+import Countdown from 'react-countdown';
+import Subscription from "./Subscription.jsx";
+import { faShoppingCart ,faTrash , faTrashCan , faSignOut , faCreditCard, faCashRegister ,faBell} from '@fortawesome/free-solid-svg-icons';
+import LoadingScreen from './LoadingScreen';
 
 
 function App() {
@@ -23,9 +25,72 @@ function App() {
     const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
     const [showAnnouncements, setShowAnnouncements] = useState(false);
     const [notificationCount, setNotificationCount] = useState(0);
+
+    const [showCountdown, setShowCountdown] = useState(false);
+    const [countdownTargetDate, setCountdownTargetDate] = useState(null);
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        // Simulate a loading delay (you can replace this with your actual loading logic)
+        const loadingTimeout = setTimeout(() => {
+            setIsLoading(false);
+        }, 3000);
+
+        // Cleanup the timeout to avoid memory leaks
+        return () => clearTimeout(loadingTimeout);
+    }, []);
+    const handleSubscribe = () => {
+        console.log('User subscribed!');
+
+        setIsSubscribed(true);
+    };
+    const renderCountdown = () => {
+        return (
+            <div className="countdown-container">
+                <Countdown
+                    date={countdownTargetDate}
+                    onComplete={() => {
+                        setShowCountdown(true);
+                    }}
+                    renderer={({  hours, minutes, seconds, completed }) => {
+                        if (completed) {
+                            return <div className="rainbow-text">Sale is currently not available!!! </div>;
+                        } else {
+                            return (
+                                <div className="countdown">
+                                    <div className="saleBoard">On Sale Now</div>
+                                    <div className="saleEnd">Ending In</div>
+                                    <div className="countdown-item">
+                                        <div className="countdown-value">{hours}</div>
+
+                                    </div>
+                                    :
+                                    <div className="countdown-item">
+                                        <div className="countdown-value">{minutes}</div>
+                                    </div>
+                                    :
+                                    <div className="countdown-item">
+                                        <div className="countdown-value">{seconds}</div>
+                                    </div>
+                                </div>
+                            );
+                        }
+                    }}
+                />
+            </div>
+        );
+    };
+
     const handleSuccessfulLogin = (userName) => {
         setName(userName); // Set the user's name
-        setLoggedIn(true); // Set loggedIn to true
+        setLoggedIn(true);
+
+        const targetDate = new Date();
+        targetDate.setMinutes(targetDate.getMinutes() + 1);
+        setCountdownTargetDate(targetDate);
+
+        setShowCountdown(true); // Display the countdown
     };
     const openRegistrationModal = () => {
         setIsRegistrationModalOpen(true);
@@ -141,17 +206,20 @@ function App() {
     };
     const addToCart = (item) => {
         const existingItem = cart.find((cartItem) => cartItem.id === item.id);
+        const discount = isSubscribed ? 0.2 : 0;
 
         if (existingItem) {
             const updatedCart = cart.map((cartItem) => {
                 if (cartItem.id === item.id) {
-                    return { ...cartItem, quantity: cartItem.quantity + 1 };
+                    return { ...cartItem, quantity: cartItem.quantity + 1,
+                        discountedPrice: (1 - discount) * cartItem.price,};
                 }
                 return cartItem;
             });
             setCart(updatedCart);
         } else {
-            setCart([...cart, { ...item, quantity: 1 }]);
+            setCart([...cart, { ...item, quantity: 1,
+                discountedPrice: (1 - discount) * item.price,}]);
         }
     };
 
@@ -174,124 +242,142 @@ function App() {
         }
     };
     const calculateTotalPrice = () => {
-        return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+        const totalPrice= cart.reduce((total, item) => total + item.discountedPrice * item.quantity, 0);
+        if (isSubscribed) {
+            const discount = 0.2; // 20% discount
+            const discountedPrice = totalPrice * (1 - discount);
+            return { totalPrice, discountedPrice, discountText: "20% OFF" };
+        } else {
+            return { totalPrice, discountedPrice: totalPrice, discountText: "" };
+        }
+
     };
 
     useEffect(() => {
         calculateTotalPrice();
     },  );
 
-    return (
-        <div className="container mt-5">
-            <div className="row justify-content-center">
-                <div className="col-md-6">
-                    <div className="card">
-                        <div className="card-header">
-                            <h2>{loggedIn ? 'Welcome' : 'Login'}</h2>
-                        </div>
-                        <div className="card-body">
-                            {loggedIn ? (
-                                <div>
-                                    <h3 className="welcome-message">Hey, {name}!</h3>
-                                    <div className="notification-icon-container">
-                                        <FontAwesomeIcon
-                                            icon={faBell}
-                                            className={`notification-icon ${showAnnouncements ? 'active' : ''}`}
-                                            onClick={() => setShowAnnouncements(!showAnnouncements)}
-                                        />
-                                        {notificationCount > 0 && (
-                                            <span className="notification-count">{notificationCount}</span>
-                                        )}
-                                    </div>
-                                    {showAnnouncements && (
-                                        <div className="announcement-container mt-3">
-                                            <h4>Announcements</h4>
-                                            <ul className="list-group">
-                                                {announcements.map((announcement) => (
-                                                    <li
-                                                        key={announcement.id}
-                                                        className={`list-group-item announcement-item ${
-                                                            announcement.read ? 'read' : 'unread'
-                                                        }`}
-                                                        onClick={() => markAnnouncementAsRead(announcement.id)}
-                                                    >
-                                                        <strong>{announcement.title}</strong>
-                                                        <p>{announcement.content}</p>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
+    return <div className="container mt-5">
+        {isLoading && <LoadingScreen />}
+        <div className="row justify-content-center">
+            <div className="col-md-6">
+                <div className="card">
+                    <div className="card-header">
+                        <h2>{loggedIn ? 'Welcome' : 'Login'}</h2>
+                    </div>
+                    <div className="card-body">
+                        {loggedIn ? <div>
+                                <h3 className="welcome-message">Hey, {name}!</h3>
+                                {showCountdown && renderCountdown()}
+                                <Subscription onSubscribe={handleSubscribe} isSubscribed={isSubscribed} />
+                                <div className="notification-icon-container">
+                                    <FontAwesomeIcon
+                                        icon={faBell}
+                                        className={`notification-icon ${showAnnouncements ? 'active' : ''}`}
+                                        onClick={() => setShowAnnouncements(!showAnnouncements)}
+                                    />
+                                    {notificationCount > 0 && (
+                                        <span className="notification-count">{notificationCount}</span>
                                     )}
 
-                                    <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-                                        <button className="btn btn-danger " onClick={handleLogout}>
-                                            <FontAwesomeIcon icon={faSignOut}  />
-                                            Logout
-                                        </button>
-                                    </div>
-                                        <div className="d-grid gap-2 d-md-flex">
-                                            <button className="btn btn-primary " onClick={() => setInMarketView(!inMarketView)}>
-                                                <FontAwesomeIcon icon={faShoppingCart} />
-                                                Market
-                                            </button>
-
-                                    </div>
-                                    {inMarketView && (
-                                        <div>
-                                            <h4>Shopping Cart</h4>
-                                            <div className="row">
-                                                {marketItems.map((item) => (
-                                                    <div key={item.id} className="col-md-4 mb-4">
-                                                        <div className="card">
-                                                            <img
-                                                                src={item.image}
-                                                                alt={item.name}
-                                                                className="card-img-top"
-                                                                onClick={() => openImageModal(item.image)}
-                                                            />
-                                                            <div className="card-body">
-                                                                <h5 className="card-title">{item.name}</h5>
-                                                                <p className="card-text">${item.price}</p>
-
-                                                                <table>
-                                                                <tbody>
-                                                                <tr>
-                                                                <td>
-                                                                <button className="btn btn-sm btn-primary" onClick={() => addToCart(item)}>+</button>
-                                                                {item.quantity}
-                                                                <button className="btn btn-sm btn-primary" onClick={() => removeFromCart(item)}>-</button>
-                                                                </td>
-
-                                                            <td>
-                                                                <button className="btn btn-danger btn-sm" onClick={() => removeFromCart(item)}>
-                                                                    <FontAwesomeIcon icon={faTrashCan} className="mr-1" />
-                                                                    Remove</button>
-
-                                                        </td>
-                                                                </tr>
-
-                                                            </tbody>
-                                                            </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    <div className="mt-3">
-
+                                </div>
+                                {showAnnouncements && (
+                                    <div className="announcement-container mt-3">
+                                        <h4>Announcements</h4>
                                         <ul className="list-group">
-                                            {cart.map((item, index) => (
-                                                <li key={index} className="list-group-item">
-                                                    {item.name} - ${item.price}
+                                            {announcements.map((announcement) => (
+                                                <li
+                                                    key={announcement.id}
+                                                    className={`list-group-item announcement-item ${
+                                                        announcement.read ? 'read' : 'unread'
+                                                    }`}
+                                                    onClick={() => markAnnouncementAsRead(announcement.id)}
+                                                >
+                                                    <strong>{announcement.title}</strong>
+                                                    <p>{announcement.content}</p>
                                                 </li>
                                             ))}
                                         </ul>
-                                        <div className="mt-3">
-                                            <h4>Total Price: ${calculateTotalPrice().toFixed(2)}</h4>
+                                    </div>
+                                )}
+
+
+                                <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button className="btn btn-danger " onClick={handleLogout}>
+                                        <FontAwesomeIcon icon={faSignOut}  />
+                                        Logout
+                                    </button>
+                                </div>
+                                <div className="d-grid gap-2 d-md-flex">
+                                    <button className="btn btn-primary " onClick={() => setInMarketView(!inMarketView)}>
+                                        <FontAwesomeIcon icon={faShoppingCart} />
+                                        Market
+                                    </button>
+
+                                </div>
+                                {inMarketView && (
+                                    <div>
+                                        <h4>Shopping Cart</h4>
+                                        <div className="row">
+                                            {marketItems.map((item) => (
+                                                <div key={item.id} className="col-md-4 mb-4">
+                                                    <div className="card">
+                                                        <img
+                                                            src={item.image}
+                                                            alt={item.name}
+                                                            className="card-img-top"
+                                                            onClick={() => openImageModal(item.image)}
+                                                        />
+                                                        <div className="card-body">
+                                                            <h5 className="card-title">{item.name}</h5>
+                                                            <p className="card-text">${item.price}</p>
+
+                                                            <table>
+                                                                <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <button className="btn btn-sm btn-primary" onClick={() => addToCart(item)}>+</button>
+                                                                        {item.quantity}
+                                                                        <button className="btn btn-sm btn-primary" onClick={() => removeFromCart(item)}>-</button>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <button className="btn btn-danger btn-sm" onClick={() => removeFromCart(item)}>
+                                                                            <FontAwesomeIcon icon={faTrashCan} className="mr-1" />
+                                                                            Remove</button>
+
+                                                                    </td>
+                                                                </tr>
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                        <div className="d-grid gap-2 d-md-block ">
+                                    </div>
+                                )}
+                                <div className="mt-3">
+
+                                    <ul className="list-group">
+                                        {cart.map((item, index) => (
+                                            <li key={index} className="list-group-item">
+                                                {item.name} - ${item.price}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <div className="mt-3">
+                                        <h4>
+                                            Total Price: ${calculateTotalPrice().totalPrice.toFixed(2)}{" "}
+                                            {isSubscribed && (
+                                                <span className="discount-text">
+                                             ({calculateTotalPrice().discountText})
+                                                </span>
+                                            )}
+                                        </h4>
+                                    </div>
+                                    <div className="d-grid gap-2 d-md-block ">
                                         <button className="btn btn-success mt-2 me-md-4" onClick={() => addToCart()}>
                                             <FontAwesomeIcon icon={faShoppingCart} className="mr-1" />
                                             Add to Cart
@@ -312,54 +398,48 @@ function App() {
 
 
 
-                                            <Modal
-                                                isOpen={isImageModalOpen}
-                                                onRequestClose={toggleImageModal}
-                                                contentLabel="Selected Image"
-                                                className="image-modal"
-                                            >
-                                                {selectedImage && (
-                                                    <div>
-                                                        <img src={selectedImage} alt="Selected" onClick={toggleImageModal} />
-                                                    </div>
-                                                )}
-                                            </Modal>
-                                        </div>
+                                        <Modal
+                                            isOpen={isImageModalOpen}
+                                            onRequestClose={toggleImageModal}
+                                            contentLabel="Selected Image"
+                                            className="image-modal"
+                                        >
+                                            {selectedImage && (
+                                                <div>
+                                                    <img src={selectedImage} alt="Selected" onClick={toggleImageModal} />
+                                                </div>
+                                            )}
+                                        </Modal>
                                     </div>
-                                    {/* Add the RatingSection component */}
-                                    <div className="mt-3">
-                                        <h4>Give a Rating</h4>
-                                        <RatingSection />
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="LogIn-container">
-                                    <div className="card-body">
-                                        <LogIn onLogin={handleSuccessfulLogin} />
-                                    </div>
-                                    <button className="btn btn-success ml-2" onClick={openRegistrationModal}>
-                                        <FontAwesomeIcon icon={faCashRegister} className="mr-1" />
-                                        Register
-                                    </button>
-                                    <WebsiteAd />
+
                                 </div>
 
-                            )}
-                        </div>
+                            </div> : <div className="LogIn-container">
+                                <div className="card-body">
+                                    <LogIn onLogin={handleSuccessfulLogin} />
+                                </div>
+                                <button className="btn btn-success ml-2" onClick={openRegistrationModal}>
+                                    <FontAwesomeIcon icon={faCashRegister} className="mr-1" />
+                                    Register
+                                </button>
+                                <WebsiteAd />
+                            </div>}
+
                     </div>
                 </div>
             </div>
-            <Modal
-                isOpen={isRegistrationModalOpen}
-                onRequestClose={closeRegistrationModal}
-                contentLabel="Registration Modal"
-                className="registration-modal"
-            >
-                <Registration />
-            </Modal>
         </div>
-    );
+        <Modal
+            isOpen={isRegistrationModalOpen}
+            onRequestClose={closeRegistrationModal}
+            contentLabel="Registration Modal"
+            className="registration-modal"
+        >
+
+            <Registration />
+        </Modal>
+    </div>;
 }
 
-export default App;
 
+export default App;

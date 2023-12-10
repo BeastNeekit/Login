@@ -130,3 +130,111 @@ table td {
 }
 
 
+
+
+
+.countdown-container {
+  border-bottom:#d5d5d5 1px solid;
+  align-items: center;
+  overflow: hidden;
+  justify-content: center;
+  margin-top: 20px;
+}
+.saleBoard{
+  color: orange;
+  font-size: 14px;
+}
+.saleEnd{
+  font-size: 14px;
+  padding-left: 50px;
+}
+/* Countdown Timer */
+.countdown {
+  display: flex;
+  align-items: center;
+}
+
+/* Countdown Timer Item (Days, Hours, Minutes, Seconds) */
+.countdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 5px;
+}
+
+.countdown-value {
+  font-size: 16px;
+  font-weight: bold;
+  background-color: white;
+  color: orange;
+  border-radius: 10px;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 60px;
+}
+
+.countdown-label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #777;
+  margin-top: 10px;
+}
+
+
+.rainbow-text {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+@keyframes rainbow {
+  0% {
+    color: #ff0000; /* Red */
+  }
+  16.67% {
+    color: #ff9900; /* Orange */
+  }
+  33.33% {
+    color: #ffff00; /* Yellow */
+  }
+  50% {
+    color: #33cc33; /* Green */
+  }
+  66.67% {
+    color: #3399ff; /* Blue */
+  }
+  83.33% {
+    color: #9900cc; /* Purple */
+  }
+  100% {
+    color: #ff0000; /* Back to Red */
+  }
+}
+
+.countdown-container {
+  animation: rainbow 0.7s linear infinite;
+}
+
+
+.discount-text {
+  color: green;
+  font-weight: bold;
+}
+
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-image: url('static/neekit.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
